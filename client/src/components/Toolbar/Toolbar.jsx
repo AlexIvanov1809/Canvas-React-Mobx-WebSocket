@@ -2,23 +2,46 @@ import React from 'react';
 import styles from './Toolbar.module.scss';
 import cn from 'classnames';
 import toolState from '@src/store/toolState';
-import Brush from '@src/tools/Brush';
 import canvasState from '@src/store/canvasState';
+import { Rect, Brush, Circle, Eraser, Line } from '@src/tools';
 
 const Toolbar = () => {
+  const changeColor = ({ target }) => {
+    toolState.setFillColor(target.value);
+    toolState.setStrokeColor(target.value);
+  };
+
   return (
     <div className={styles.toolbar}>
       <button
         className={cn(styles.toolbar__btn, styles.brush)}
         onClick={() => toolState.setTool(new Brush(canvasState.canvas))}
       ></button>
-      <button className={cn(styles.toolbar__btn, styles.rect)}></button>
-      <button className={cn(styles.toolbar__btn, styles.circle)}></button>
-      <button className={cn(styles.toolbar__btn, styles.eraser)}></button>
-      <button className={cn(styles.toolbar__btn, styles.line)}></button>
-      <input type='color' />
-      <button className={cn(styles.toolbar__btn, styles.undo)}></button>
-      <button className={cn(styles.toolbar__btn, styles.redo)}></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.rect)}
+        onClick={() => toolState.setTool(new Rect(canvasState.canvas))}
+      ></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.circle)}
+        onClick={() => toolState.setTool(new Circle(canvasState.canvas))}
+      ></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.eraser)}
+        onClick={() => toolState.setTool(new Eraser(canvasState.canvas))}
+      ></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.line)}
+        onClick={() => toolState.setTool(new Line(canvasState.canvas))}
+      ></button>
+      <input onChange={(e) => changeColor(e)} type='color' />
+      <button
+        className={cn(styles.toolbar__btn, styles.undo)}
+        onClick={() => canvasState.undo()}
+      ></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.redo)}
+        onClick={() => canvasState.redo()}
+      ></button>
       <button className={cn(styles.toolbar__btn, styles.save)}></button>
     </div>
   );

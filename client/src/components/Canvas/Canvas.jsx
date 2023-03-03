@@ -7,13 +7,23 @@ import styles from './Canvas.module.scss';
 
 const Canvas = observer(() => {
   const canvasRef = useRef();
+
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
     toolState.setTool(new Brush(canvasRef.current));
   }, []);
+
+  const mouseDownHandler = () => {
+    canvasState.pushToUndo(canvasRef.current.toDataURL());
+  };
   return (
     <div className={styles.canvas}>
-      <canvas ref={canvasRef} width={600} height={400} />
+      <canvas
+        onMouseDown={mouseDownHandler}
+        ref={canvasRef}
+        width={600}
+        height={400}
+      />
     </div>
   );
 });

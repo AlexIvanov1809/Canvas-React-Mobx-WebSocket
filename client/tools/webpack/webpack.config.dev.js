@@ -17,6 +17,7 @@ module.exports = {
   devtool: 'cheap-module-source-map',
   devServer: {
     open: true,
+    historyApiFallback: true,
   },
   optimization: {
     splitChunks: {

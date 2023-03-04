@@ -11,15 +11,41 @@ const Toolbar = () => {
     toolState.setStrokeColor(target.value);
   };
 
+  const download = () => {
+    const dataUrl = canvasState.canvas.toDataURL();
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = canvasState.sessionid + '.jpeg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <div className={styles.toolbar}>
       <button
         className={cn(styles.toolbar__btn, styles.brush)}
-        onClick={() => toolState.setTool(new Brush(canvasState.canvas))}
+        onClick={() =>
+          toolState.setTool(
+            new Brush(
+              canvasState.canvas,
+              canvasState.socket,
+              canvasState.sessionid,
+            ),
+          )
+        }
       ></button>
       <button
         className={cn(styles.toolbar__btn, styles.rect)}
-        onClick={() => toolState.setTool(new Rect(canvasState.canvas))}
+        onClick={() =>
+          toolState.setTool(
+            new Rect(
+              canvasState.canvas,
+              canvasState.socket,
+              canvasState.sessionid,
+            ),
+          )
+        }
       ></button>
       <button
         className={cn(styles.toolbar__btn, styles.circle)}
@@ -42,7 +68,10 @@ const Toolbar = () => {
         className={cn(styles.toolbar__btn, styles.redo)}
         onClick={() => canvasState.redo()}
       ></button>
-      <button className={cn(styles.toolbar__btn, styles.save)}></button>
+      <button
+        className={cn(styles.toolbar__btn, styles.save)}
+        onClick={download}
+      ></button>
     </div>
   );
 };

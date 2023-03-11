@@ -1,9 +1,18 @@
 import React from 'react';
 import styles from './Toolbar.module.scss';
-import cn from 'classnames';
 import toolState from '@src/store/toolState';
 import canvasState from '@src/store/canvasState';
 import { Rect, Brush, Circle, Eraser, Line } from '@src/tools';
+import {
+  BrushIcon,
+  CircleIcon,
+  EraserIcon,
+  LineIcon,
+  RectIcon,
+  RedoIcon,
+  SaveIcon,
+  UndoIcon,
+} from '@src/assets/icons/';
 
 const Toolbar = () => {
   const changeColor = ({ target }) => {
@@ -24,19 +33,22 @@ const Toolbar = () => {
   return (
     <div className={styles.toolbar}>
       <button
-        className={cn(styles.toolbar__btn, styles.brush)}
+        className={styles.toolbar__btn}
         onClick={() =>
           toolState.setTool(
             new Brush(
               canvasState.canvas,
               canvasState.socket,
               canvasState.sessionid,
+              'brush',
             ),
           )
         }
-      ></button>
+      >
+        <BrushIcon />
+      </button>
       <button
-        className={cn(styles.toolbar__btn, styles.rect)}
+        className={styles.toolbar__btn}
         onClick={() =>
           toolState.setTool(
             new Rect(
@@ -46,32 +58,72 @@ const Toolbar = () => {
             ),
           )
         }
-      ></button>
+      >
+        <RectIcon />
+      </button>
       <button
-        className={cn(styles.toolbar__btn, styles.circle)}
-        onClick={() => toolState.setTool(new Circle(canvasState.canvas))}
-      ></button>
+        className={styles.toolbar__btn}
+        onClick={() =>
+          toolState.setTool(
+            new Circle(
+              canvasState.canvas,
+              canvasState.socket,
+              canvasState.sessionid,
+            ),
+          )
+        }
+      >
+        <CircleIcon />
+      </button>
       <button
-        className={cn(styles.toolbar__btn, styles.eraser)}
-        onClick={() => toolState.setTool(new Eraser(canvasState.canvas))}
-      ></button>
+        className={styles.toolbar__btn}
+        onClick={() =>
+          toolState.setTool(
+            new Eraser(
+              canvasState.canvas,
+              canvasState.socket,
+              canvasState.sessionid,
+              'eraser',
+            ),
+          )
+        }
+      >
+        <EraserIcon />
+      </button>
       <button
-        className={cn(styles.toolbar__btn, styles.line)}
-        onClick={() => toolState.setTool(new Line(canvasState.canvas))}
-      ></button>
+        className={styles.toolbar__btn}
+        onClick={() =>
+          toolState.setTool(
+            new Line(
+              canvasState.canvas,
+              canvasState.socket,
+              canvasState.sessionid,
+            ),
+          )
+        }
+      >
+        <LineIcon />
+      </button>
       <input onChange={(e) => changeColor(e)} type='color' />
       <button
-        className={cn(styles.toolbar__btn, styles.undo)}
-        onClick={() => canvasState.undo()}
-      ></button>
+        className={styles.toolbar__btn}
+        onClick={() =>
+          canvasState.undo(canvasState.sessionid, canvasState.socket)
+        }
+      >
+        <UndoIcon />
+      </button>
       <button
-        className={cn(styles.toolbar__btn, styles.redo)}
-        onClick={() => canvasState.redo()}
-      ></button>
-      <button
-        className={cn(styles.toolbar__btn, styles.save)}
-        onClick={download}
-      ></button>
+        className={styles.toolbar__btn}
+        onClick={() =>
+          canvasState.redo(canvasState.sessionid, canvasState.socket)
+        }
+      >
+        <RedoIcon />
+      </button>
+      <button className={styles.toolbar__btn} onClick={download}>
+        <SaveIcon />
+      </button>
     </div>
   );
 };

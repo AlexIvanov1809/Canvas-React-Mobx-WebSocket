@@ -1,13 +1,14 @@
 import Brush from './Brush';
 
 export default class Eraser extends Brush {
-  constructor(canvas) {
-    super(canvas);
+  constructor(canvas, socket, id, type) {
+    super(canvas, socket, id, type);
   }
 
-  draw(x, y) {
-    this.ctx.strokeStyle = 'white';
-    this.ctx.lineTo(x, y);
-    this.ctx.stroke();
+  static draw(ctx, x, y, lineWidth) {
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = lineWidth;
+    ctx.lineTo(x, y);
+    ctx.stroke();
   }
 }

@@ -1,8 +1,10 @@
 import Tool from './Tool';
 
 export default class Brush extends Tool {
-  constructor(canvas, socket, id) {
+  constructor(canvas, socket, id, type) {
+    console.log(type);
     super(canvas, socket, id);
+    this.type = type || 'brush';
     this.listen();
   }
 
@@ -40,16 +42,20 @@ export default class Brush extends Tool {
           method: 'draw',
           id: this.id,
           figure: {
-            type: 'brush',
+            type: this.type,
             x: e.pageX - e.target.offsetLeft,
             y: e.pageY - e.target.offsetTop,
+            lineWidth: this.ctx.lineWidth,
+            color: this.ctx.strokeStyle,
           },
         }),
       );
     }
   }
 
-  static draw(ctx, x, y) {
+  static draw(ctx, x, y, color, lineWidth) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
     ctx.lineTo(x, y);
     ctx.stroke();
   }

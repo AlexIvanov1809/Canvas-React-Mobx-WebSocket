@@ -1,6 +1,6 @@
 import canvasState from '@src/store/canvasState';
 import toolState from '@src/store/toolState';
-import { Rect, Brush } from '@src/tools';
+import { Rect, Brush, Eraser, Circle, Line } from '@src/tools';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -13,24 +13,31 @@ const Canvas = observer(() => {
   const params = useParams();
   const [modal, setModal] = useState(true);
 
+  const downloadCurrentImage = (data) => {
+    const img = new Image();
+    const ctx = canvasRef.current.getContext('2d');
+    img.src = data;
+    img.onload = async () => {
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height,
+      );
+      ctx.stroke();
+    };
+  };
+
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
-    axios.get(`http://localhost:5000/image?id=${params.id}`).then((resp) => {
-      const img = new Image();
-      const ctx = canvasRef.current.getContext('2d');
-      img.src = resp.data;
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        ctx.drawImage(
-          img,
-          0,
-          0,
-          canvasRef.current.width,
-          canvasRef.current.height,
-        );
-        ctx.stroke();
-      };
-    });
+    axios
+      .get(`http://localhost:5000/image?id=${params.id}`)
+      .then((resp) => {
+        downloadCurrentImage(resp.data);
+      })
+      .catch((err) => console.log(err.message));
   }, []);
 
   useEffect(() => {
@@ -70,7 +77,7 @@ const Canvas = observer(() => {
     const ctx = canvasRef.current.getContext('2d');
     switch (figure.type) {
       case 'brush':
-        Brush.draw(ctx, figure.x, figure.y);
+        Brush.draw(ctx, figure.x, figure.y, figure.color, figure.lineWidth);
         break;
       case 'rect':
         Rect.staticDraw(
@@ -79,8 +86,44 @@ const Canvas = observer(() => {
           figure.y,
           figure.width,
           figure.height,
-          figure.color,
+          figure.fillColor,
+          figure.strokeColor,
+          figure.lineWidth,
         );
+        break;
+      case 'circle':
+        Circle.staticDraw(
+          ctx,
+          figure.x,
+          figure.y,
+          figure.r,
+          figure.fillColor,
+          figure.strokeColor,
+          figure.lineWidth,
+        );
+        break;
+      case 'eraser':
+        Eraser.draw(ctx, figure.x, figure.y, figure.lineWidth);
+        break;
+      case 'line':
+        Line.staticDraw(
+          ctx,
+          figure.x,
+          figure.y,
+          figure.currentX,
+          figure.currentY,
+          figure.color,
+          figure.lineWidth,
+        );
+        break;
+      case 'undo':
+        downloadCurrentImage(figure.img);
+        break;
+      case 'redo':
+        downloadCurrentImage(figure.img);
+        break;
+      case 'empty':
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         break;
       case 'finish':
         ctx.beginPath();

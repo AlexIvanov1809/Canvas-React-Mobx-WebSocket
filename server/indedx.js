@@ -4,6 +4,7 @@ const WSServer = require("express-ws")(app);
 const aWss = WSServer.getWss();
 const fs = require("fs");
 const path = require("path");
+// const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 5000;
 
@@ -48,8 +49,7 @@ app.get("/image", (req, res) => {
     const data = "data:image/png;base64," + file.toString("base64");
     return res.json(data);
   } catch (e) {
-    console.log(e);
-    return res.status(500).json("Error");
+    return res.status(500).send({ message: "Error" });
   }
 });
 

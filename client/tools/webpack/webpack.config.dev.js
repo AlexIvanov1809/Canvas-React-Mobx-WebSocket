@@ -16,7 +16,15 @@ module.exports = {
   stats: 'errors-warnings',
   devtool: 'cheap-module-source-map',
   devServer: {
+    port: 3000,
     open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        pathRewrite: { '^/api': '' },
+        secure: false,
+      },
+    },
     historyApiFallback: true,
   },
   optimization: {

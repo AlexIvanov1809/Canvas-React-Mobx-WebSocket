@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
 
 class CanvasState {
@@ -35,7 +36,7 @@ class CanvasState {
     this.redoList.push(data);
   }
 
-  undo() {
+  undo(id, socket) {
     let ctx = this.canvas.getContext('2d');
 
     if (this.undoList.length > 0) {
@@ -48,12 +49,36 @@ class CanvasState {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
       };
+      socket.send(
+        JSON.stringify({
+          method: 'draw',
+          id,
+          figure: {
+            type: 'undo',
+            img: dataUrl,
+          },
+        }),
+      );
+      axios
+        .post(`http://localhost:5000/image?id=${id}`, {
+          img: dataUrl,
+        })
+        .then((resp) => console.log(resp.data));
     } else {
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      socket.send(
+        JSON.stringify({
+          method: 'draw',
+          id,
+          figure: {
+            type: 'empty',
+          },
+        }),
+      );
     }
   }
 
-  redo() {
+  redo(id, socket) {
     let ctx = this.canvas.getContext('2d');
 
     if (this.redoList.length > 0) {
@@ -66,6 +91,21 @@ class CanvasState {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
       };
+      socket.send(
+        JSON.stringify({
+          method: 'draw',
+          id,
+          figure: {
+            type: 'redo',
+            img: dataUrl,
+          },
+        }),
+      );
+      axios
+        .post(`http://localhost:5000/image?id=${id}`, {
+          img: dataUrl,
+        })
+        .then((resp) => console.log(resp.data));
     }
   }
 }

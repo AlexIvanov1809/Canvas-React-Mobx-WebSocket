@@ -4,7 +4,6 @@ const WSServer = require("express-ws")(app);
 const aWss = WSServer.getWss();
 const fs = require("fs");
 const path = require("path");
-// const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const PORT = process.env.PORT || 5000;
 

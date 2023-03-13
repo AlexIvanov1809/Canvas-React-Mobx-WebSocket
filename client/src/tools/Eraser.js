@@ -1,4 +1,4 @@
-import Brush from './Brush';
+import Brush from "./Brush";
 
 export default class Eraser extends Brush {
   constructor(canvas, socket, id, type) {
@@ -6,7 +6,7 @@ export default class Eraser extends Brush {
   }
 
   static draw(ctx, x, y, lineWidth) {
-    ctx.strokeStyle = 'white';
+    ctx.strokeStyle = "white";
     ctx.lineWidth = lineWidth;
     ctx.lineTo(x, y);
     ctx.stroke();

@@ -1,10 +1,9 @@
-import Tool from './Tool';
+import Tool from "./Tool";
 
 export default class Brush extends Tool {
   constructor(canvas, socket, id, type) {
-    console.log(type);
     super(canvas, socket, id);
-    this.type = type || 'brush';
+    this.type = type || "brush";
     this.listen();
   }
 
@@ -18,12 +17,12 @@ export default class Brush extends Tool {
     this.onmouseDown = false;
     this.socket.send(
       JSON.stringify({
-        method: 'draw',
+        method: "draw",
         id: this.id,
         figure: {
-          type: 'finish',
-        },
-      }),
+          type: "finish"
+        }
+      })
     );
   }
   mouseDownHandler(e) {
@@ -31,7 +30,7 @@ export default class Brush extends Tool {
     this.ctx.beginPath();
     this.ctx.moveTo(
       e.pageX - e.target.offsetLeft,
-      e.pageY - e.target.offsetTop,
+      e.pageY - e.target.offsetTop
     );
   }
   mouseMoveHandler(e) {
@@ -39,16 +38,16 @@ export default class Brush extends Tool {
       // this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop);
       this.socket.send(
         JSON.stringify({
-          method: 'draw',
+          method: "draw",
           id: this.id,
           figure: {
             type: this.type,
             x: e.pageX - e.target.offsetLeft,
             y: e.pageY - e.target.offsetTop,
             lineWidth: this.ctx.lineWidth,
-            color: this.ctx.strokeStyle,
-          },
-        }),
+            color: this.ctx.strokeStyle
+          }
+        })
       );
     }
   }

@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { makeAutoObservable } from 'mobx';
+import axios from "axios";
+import { makeAutoObservable } from "mobx";
 
 class CanvasState {
   canvas = null;
@@ -7,7 +7,7 @@ class CanvasState {
   sessionid = null;
   undoList = [];
   redoList = [];
-  username = '';
+  username = "";
   constructor() {
     makeAutoObservable(this);
   }
@@ -37,7 +37,7 @@ class CanvasState {
   }
 
   undo(id, socket) {
-    let ctx = this.canvas.getContext('2d');
+    let ctx = this.canvas.getContext("2d");
 
     if (this.undoList.length > 0) {
       let dataUrl = this.undoList.pop();
@@ -51,35 +51,35 @@ class CanvasState {
       };
       socket.send(
         JSON.stringify({
-          method: 'draw',
+          method: "draw",
           id,
           figure: {
-            type: 'undo',
-            img: dataUrl,
-          },
-        }),
+            type: "undo",
+            img: dataUrl
+          }
+        })
       );
       axios
         .post(`http://localhost:5000/image?id=${id}`, {
-          img: dataUrl,
+          img: dataUrl
         })
         .then((resp) => console.log(resp.data));
     } else {
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       socket.send(
         JSON.stringify({
-          method: 'draw',
+          method: "draw",
           id,
           figure: {
-            type: 'empty',
-          },
-        }),
+            type: "empty"
+          }
+        })
       );
     }
   }
 
   redo(id, socket) {
-    let ctx = this.canvas.getContext('2d');
+    let ctx = this.canvas.getContext("2d");
 
     if (this.redoList.length > 0) {
       let dataUrl = this.redoList.pop();
@@ -93,17 +93,17 @@ class CanvasState {
       };
       socket.send(
         JSON.stringify({
-          method: 'draw',
+          method: "draw",
           id,
           figure: {
-            type: 'redo',
-            img: dataUrl,
-          },
-        }),
+            type: "redo",
+            img: dataUrl
+          }
+        })
       );
       axios
         .post(`http://localhost:5000/image?id=${id}`, {
-          img: dataUrl,
+          img: dataUrl
         })
         .then((resp) => console.log(resp.data));
     }

@@ -3,7 +3,7 @@ export default class Tool {
     this.canvas = canvas;
     this.socket = socket;
     this.id = id;
-    this.ctx = canvas.getContext('2d');
+    this.ctx = canvas.getContext("2d");
     this.destroyEvent();
   }
 

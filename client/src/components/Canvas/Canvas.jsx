@@ -1,21 +1,23 @@
-import canvasState from '@src/store/canvasState';
-import toolState from '@src/store/toolState';
-import { Rect, Brush, Eraser, Circle, Line } from '@src/tools';
-import { observer } from 'mobx-react-lite';
-import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import styles from './Canvas.module.scss';
-import axios from 'axios';
+import canvasState from "@src/store/canvasState";
+import toolState from "@src/store/toolState";
+import { Rect, Brush, Eraser, Circle, Line } from "@src/tools";
+import { observer } from "mobx-react-lite";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import styles from "./Canvas.module.scss";
+import axios from "axios";
+import ModalMenu from "../ModalMenu/ModalMenu";
+
+const ENDPOINT = "http://localhost:5000/image?id=";
 
 const Canvas = observer(() => {
   const canvasRef = useRef();
-  const usernameRef = useRef();
   const params = useParams();
   const [modal, setModal] = useState(true);
 
   const downloadCurrentImage = (data) => {
     const img = new Image();
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = canvasRef.current.getContext("2d");
     img.src = data;
     img.onload = async () => {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -24,7 +26,7 @@ const Canvas = observer(() => {
         0,
         0,
         canvasRef.current.width,
-        canvasRef.current.height,
+        canvasRef.current.height
       );
       ctx.stroke();
     };
@@ -33,7 +35,7 @@ const Canvas = observer(() => {
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
     axios
-      .get(`http://localhost:5000/image?id=${params.id}`)
+      .get(ENDPOINT + params.id)
       .then((resp) => {
         downloadCurrentImage(resp.data);
       })
@@ -42,27 +44,27 @@ const Canvas = observer(() => {
 
   useEffect(() => {
     if (canvasState.username) {
-      const socket = new WebSocket('ws://localhost:5000');
+      const socket = new WebSocket("ws://localhost:5000");
       canvasState.setSocket(socket);
       canvasState.setSessionid(params.id);
       toolState.setTool(new Brush(canvasRef.current, socket, params.id));
       socket.onopen = () => {
-        console.log('connect');
+        console.log("connect");
         socket.send(
           JSON.stringify({
             id: params.id,
             username: canvasState.username,
-            method: 'connection',
-          }),
+            method: "connection"
+          })
         );
       };
       socket.onmessage = (e) => {
         let msg = JSON.parse(e.data);
         switch (msg.method) {
-          case 'connection':
+          case "connection":
             console.log(`User ${msg.username} was connected`);
             break;
-          case 'draw':
+          case "draw":
             drawHandler(msg);
             break;
           default:
@@ -74,12 +76,12 @@ const Canvas = observer(() => {
 
   const drawHandler = (msg) => {
     const figure = msg.figure;
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = canvasRef.current.getContext("2d");
     switch (figure.type) {
-      case 'brush':
+      case "brush":
         Brush.draw(ctx, figure.x, figure.y, figure.color, figure.lineWidth);
         break;
-      case 'rect':
+      case "rect":
         Rect.staticDraw(
           ctx,
           figure.x,
@@ -88,10 +90,10 @@ const Canvas = observer(() => {
           figure.height,
           figure.fillColor,
           figure.strokeColor,
-          figure.lineWidth,
+          figure.lineWidth
         );
         break;
-      case 'circle':
+      case "circle":
         Circle.staticDraw(
           ctx,
           figure.x,
@@ -99,13 +101,13 @@ const Canvas = observer(() => {
           figure.r,
           figure.fillColor,
           figure.strokeColor,
-          figure.lineWidth,
+          figure.lineWidth
         );
         break;
-      case 'eraser':
+      case "eraser":
         Eraser.draw(ctx, figure.x, figure.y, figure.lineWidth);
         break;
-      case 'line':
+      case "line":
         Line.staticDraw(
           ctx,
           figure.x,
@@ -113,19 +115,19 @@ const Canvas = observer(() => {
           figure.currentX,
           figure.currentY,
           figure.color,
-          figure.lineWidth,
+          figure.lineWidth
         );
         break;
-      case 'undo':
+      case "undo":
         downloadCurrentImage(figure.img);
         break;
-      case 'redo':
+      case "redo":
         downloadCurrentImage(figure.img);
         break;
-      case 'empty':
+      case "empty":
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         break;
-      case 'finish':
+      case "finish":
         ctx.beginPath();
         break;
       default:
@@ -136,27 +138,20 @@ const Canvas = observer(() => {
   const mouseDownHandler = () => {
     canvasState.pushToUndo(canvasRef.current.toDataURL());
     axios
-      .post(`http://localhost:5000/image?id=${params.id}`, {
-        img: canvasRef.current.toDataURL(),
+      .post(ENDPOINT + params.id, {
+        img: canvasRef.current.toDataURL()
       })
-      .then((resp) => console.log(resp.data));
+      .then((resp) => console.log(resp.data))
+      .catch((e) => console.log(e));
   };
 
-  const connectionHandler = () => {
-    canvasState.setUsername(usernameRef.current.value);
+  const connectionHandler = (data) => {
+    canvasState.setUsername(data);
     setModal(false);
   };
   return (
     <div className={styles.canvas}>
-      {modal && (
-        <div className={styles.modalBack}>
-          <div className={styles.modal}>
-            <h2>Enter your name</h2>
-            <input ref={usernameRef} type='text' />
-            <button onClick={connectionHandler}>Enter</button>
-          </div>
-        </div>
-      )}
+      {modal && <ModalMenu onSubmit={connectionHandler} />}
       <canvas
         onMouseDown={mouseDownHandler}
         ref={canvasRef}

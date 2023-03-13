@@ -1,4 +1,4 @@
-import Tool from './Tool';
+import Tool from "./Tool";
 
 export default class Line extends Tool {
   constructor(canvas, socket, id) {
@@ -16,18 +16,18 @@ export default class Line extends Tool {
     this.onmouseDown = false;
     this.socket.send(
       JSON.stringify({
-        method: 'draw',
+        method: "draw",
         id: this.id,
         figure: {
-          type: 'line',
+          type: "line",
           x: e.pageX - e.target.offsetLeft,
           y: e.pageY - e.target.offsetTop,
           currentX: this.currentX,
           currentY: this.currentY,
           lineWidth: this.ctx.lineWidth,
-          color: this.ctx.strokeStyle,
-        },
-      }),
+          color: this.ctx.strokeStyle
+        }
+      })
     );
   }
   mouseDownHandler(e) {
@@ -53,7 +53,7 @@ export default class Line extends Tool {
     ctx.stroke();
   }
   draw(x, y) {
-    console.log('here');
+    console.log("here");
     const img = new Image();
     img.src = this.saved;
     img.onload = async () => {

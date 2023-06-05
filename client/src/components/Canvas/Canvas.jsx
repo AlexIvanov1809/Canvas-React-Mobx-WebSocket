@@ -8,7 +8,7 @@ import styles from "./Canvas.module.scss";
 import axios from "axios";
 import ModalMenu from "../ModalMenu/ModalMenu";
 
-const ENDPOINT = "http://localhost:5000/image?id=";
+export const ENDPOINT = "http://localhost:3000/api/image?id=";
 
 const Canvas = observer(() => {
   const canvasRef = useRef();
@@ -135,7 +135,7 @@ const Canvas = observer(() => {
     }
   };
 
-  const mouseDownHandler = () => {
+  const mouseUpHandler = () => {
     canvasState.pushToUndo(canvasRef.current.toDataURL());
     axios
       .post(ENDPOINT + params.id, {
@@ -153,7 +153,7 @@ const Canvas = observer(() => {
     <div className={styles.canvas}>
       {modal && <ModalMenu onSubmit={connectionHandler} />}
       <canvas
-        onMouseDown={mouseDownHandler}
+        onMouseUp={mouseUpHandler}
         ref={canvasRef}
         width={600}
         height={400}

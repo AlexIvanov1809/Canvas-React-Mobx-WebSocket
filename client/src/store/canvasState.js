@@ -1,3 +1,4 @@
+import { ENDPOINT } from "@src/components/Canvas/Canvas";
 import axios from "axios";
 import { makeAutoObservable } from "mobx";
 
@@ -38,7 +39,7 @@ class CanvasState {
 
   undo(id, socket) {
     let ctx = this.canvas.getContext("2d");
-
+    console.log(`redo: ${this.redoList.length}, undo: ${this.undoList.length}`);
     if (this.undoList.length > 0) {
       let dataUrl = this.undoList.pop();
       this.redoList.push(this.canvas.toDataURL());
@@ -60,7 +61,7 @@ class CanvasState {
         })
       );
       axios
-        .post(`http://localhost:5000/image?id=${id}`, {
+        .post(ENDPOINT + id, {
           img: dataUrl
         })
         .then((resp) => console.log(resp.data));
@@ -80,7 +81,7 @@ class CanvasState {
 
   redo(id, socket) {
     let ctx = this.canvas.getContext("2d");
-
+    console.log(`redo: ${this.redoList.length}, undo: ${this.undoList.length}`);
     if (this.redoList.length > 0) {
       let dataUrl = this.redoList.pop();
       this.undoList.push(this.canvas.toDataURL());
@@ -102,7 +103,7 @@ class CanvasState {
         })
       );
       axios
-        .post(`http://localhost:5000/image?id=${id}`, {
+        .post(ENDPOINT + id, {
           img: dataUrl
         })
         .then((resp) => console.log(resp.data));

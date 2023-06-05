@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Toolbar.module.scss";
 import toolState from "@src/store/toolState";
 import canvasState from "@src/store/canvasState";
@@ -14,8 +14,9 @@ import {
   UndoIcon
 } from "@src/assets/icons/";
 import cn from "classnames";
+import { observer } from "mobx-react-lite";
 
-const Toolbar = () => {
+const Toolbar = observer(() => {
   const defaultState = {
     brush: false,
     rect: false,
@@ -120,6 +121,6 @@ const Toolbar = () => {
       </button>
     </div>
   );
-};
+});
 
 export default Toolbar;

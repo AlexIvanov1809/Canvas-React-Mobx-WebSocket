@@ -1,23 +1,24 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const WSServer = require("express-ws")(app);
+const WSServer = require('express-ws')(app);
 const aWss = WSServer.getWss();
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 5000;
+const ENDPOINT = '/api/image';
 
 app.use(express.json());
 
-app.ws("/", (ws, req) => {
-  console.log("Connected");
-  ws.on("message", (msg) => {
+app.ws('/', (ws, req) => {
+  console.log('Connected');
+  ws.on('message', (msg) => {
     msg = JSON.parse(msg);
     switch (msg.method) {
-      case "connection":
+      case 'connection':
         connectionHandler(ws, msg);
         break;
-      case "draw":
+      case 'draw':
         broadcastConnection(ws, msg);
         break;
       default:
@@ -26,29 +27,29 @@ app.ws("/", (ws, req) => {
   });
 });
 
-app.post("/image", (req, res) => {
+app.post(ENDPOINT, (req, res) => {
   try {
-    const data = req.body.img.replace("data:image/png;base64,", "");
+    const data = req.body.img.replace('data:image/png;base64,', '');
     fs.writeFileSync(
-      path.resolve(__dirname, "files", `${req.query.id}.jpg`),
+      path.resolve(__dirname, 'files', `${req.query.id}.jpg`),
       data,
-      "base64",
+      'base64',
     );
-    return res.json({ message: "Downloaded" });
+    return res.json({ message: 'Downloaded' });
   } catch (e) {
     console.log(e);
-    return res.status(500).json("Error");
+    return res.status(500).json('Error');
   }
 });
-app.get("/image", (req, res) => {
+app.get(ENDPOINT, (req, res) => {
   try {
     const file = fs.readFileSync(
-      path.resolve(__dirname, "files", `${req.query.id}.jpg`),
+      path.resolve(__dirname, 'files', `${req.query.id}.jpg`),
     );
-    const data = "data:image/png;base64," + file.toString("base64");
+    const data = 'data:image/png;base64,' + file.toString('base64');
     return res.json(data);
   } catch (e) {
-    return res.status(500).send({ message: "Error" });
+    return res.status(500).send({ message: 'Error' });
   }
 });
 
